@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+@page{margin:18mm 16mm}
+body{font-family:'Helvetica Neue',Arial,sans-serif;color:#1a1d24;font-size:10.5pt;line-height:1.45}
+h1{font-size:17pt;margin:0 0 2px}
+h2{font-size:12pt;margin:16px 0 4px;border-bottom:2px solid #2c313b;padding-bottom:3px}
+.sub{color:#666;font-size:9pt;margin:0 0 4px}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+th{background:#16181d;color:#fff;text-align:left;padding:5px 7px;font-size:9pt}
+td{border-bottom:1px solid #ddd;padding:5px 7px;vertical-align:top;font-size:9.5pt}
+.yes{color:#0a7c42;font-weight:700}
+.no{color:#b3261e;font-weight:700}
+.tag{display:inline-block;background:#eef2f7;border-radius:4px;padding:0 6px;font-size:8.5pt;color:#2c313b}
+.note{background:#f6f4ec;border-left:3px solid #f2b84b;padding:7px 10px;font-size:9pt;margin-top:10px}
+ul{margin:4px 0 4px 16px;padding:0}
+li{margin-bottom:3px}
+a{color:#1a56db;text-decoration:none}
+h2{page-break-after:avoid}
+.pb{page-break-before:always}
+</style></head><body>
+<h1>Email Finder - sources &amp; tools</h1>
+<p class="sub">Researched and verified 20 Nov 2026. Rule set: no LinkedIn scraping, no paid services without your OK, no accounts created for you, no bypassing access controls.</p>
+
+<h2>1. Already built into your tool (free, no key, no signup)</h2>
+<table><tr><th>Source</th><th>What it gives</th><th>Limits</th></tr>
+<tr><td>Company careers / contact / team / press pages + job postings</td><td>Published emails, the strongest evidence. Tool 2 scans any page you paste and links each address to its source page.</td><td>Some sites block readers; heavy JS pages may truncate. A company site or the person's own profile outranks an aggregator repeating an address.</td></tr>
+<tr><td>Your PM Radar feed (<a href="https://aashikas7.github.io/pm-radar/data/jobs.json">aashikas7.github.io/pm-radar/data/jobs.json</a>)</td><td>HR emails published in postings, refreshed hourly. Demo found 3 published addresses.</td><td>Only roles that publish an email.</td></tr>
+<tr><td>DNS MX records (Cloudflare DNS-over-HTTPS)</td><td>Proof a domain accepts mail + provider (Google-hosted, Microsoft-hosted...).</td><td>Cannot prove a specific mailbox exists, and cannot detect catch-all domains.</td></tr>
+<tr><td><a href="https://clearbit.com">Clearbit autocomplete</a></td><td>Company name to domain resolution.</td><td>Free endpoint, no key; could change since HubSpot bought Clearbit.</td></tr>
+<tr><td><a href="https://gravatar.com">Gravatar existence check</a></td><td>The exact address appears publicly (Seen publicly label).</td><td>Proves past public use, not current deliverability or employer. Minority of work emails have Gravatar.</td></tr>
+<tr><td>PGP keyserver (<a href="https://keys.openpgp.org">keys.openpgp.org</a>)</td><td>Address has a published PGP key (Seen publicly label).</td><td>Same caveat: public association, not deliverability. Mostly technical people.</td></tr>
+<tr><td><a href="https://docs.github.com">Public GitHub profiles + commits</a></td><td>Exact-domain emails people publish on GitHub (Published label).</td><td>API limits without a token: 60 req/hr, search 10/min.</td></tr>
+<tr><td>Reader relays: <a href="https://jina.ai/reader">r.jina.ai</a>, <a href="https://allorigins.win">allorigins.win</a></td><td>Fetch public pages past browser CORS blocks.</td><td>r.jina.ai: 20 req/min without key. allorigins: best effort.</td></tr></table>
+
+<h2>2. More source sites worth pointing Tool 2 at (published addresses)</h2>
+<ul>
+<li><b>Google Play / app store developer pages</b> - developer contact emails are published by design.</li>
+<li><b>Conference, meetup and podcast speaker pages</b> - often list a direct email.</li>
+<li><b>Personal sites, blogs, resumes, Linktree-style pages</b> - founders and senior people often publish theirs.</li>
+<li><b>Company docs, support portals, security.txt files</b> - security@ and support@ are published by convention.</li>
+<li><b>Regulatory filings (MCA, SEC, EU registries)</b> - officer emails sometimes appear in PDFs.</li>
+<li><b>WHOIS / RDAP</b> - mostly redacted since GDPR; occasionally shows a contact for small domains.</li>
+</ul>
+
+<h2 class="pb">3. Extraction tools (free, for bulk page work outside the website)</h2>
+<table><tr><th>Tool</th><th>Type</th><th>Free allowance</th><th>Watch out</th></tr>
+<tr><td>Instant Data Scraper</td><td>Chrome extension</td><td class="yes">Fully free</td><td>Reads the list on screen only; cannot follow into detail pages.</td></tr>
+<tr><td><a href="https://webscraper.io">Web Scraper (webscraper.io)</a></td><td>Chrome extension</td><td class="yes">Free for local scraping</td><td>Learning curve; cloud runs are paid ($50/mo plan).</td></tr>
+<tr><td><a href="https://www.octoparse.com">Octoparse</a></td><td>Desktop app</td><td>10 crawlers, 2 concurrent, 10k records/export, 50k/month</td><td>Free tier needs an account.</td></tr>
+<tr><td><a href="https://scrapy.org">Scrapy</a> / <a href="https://playwright.dev">Playwright</a></td><td>Code (open source)</td><td class="yes">Fully free</td><td>You write and run the scraper yourself.</td></tr></table>
+
+<h2>4. Finder &amp; verification APIs (plug into the worker when you want them)</h2>
+<p class="sub">The worker ships with Hunter wired as the reference integration. Each other service is a small follow-up (one source object plus its key), not connected today. Signups would be in your name, only when you choose.</p>
+<table><tr><th>Service</th><th>Free tier (verified 20 Nov 2026)</th><th>What it adds</th><th>Watch out</th></tr>
+<tr><td><a href="https://hunter.io/pricing">Hunter.io</a></td><td>50 credits/month free (1 credit per find, 0.5 per verify)</td><td>Email finder + mailbox verification status</td><td>Credits reset monthly, no rollover.</td></tr>
+<tr><td><a href="https://snov.io/knowledgebase/faq-pricing-plans">Snov.io</a></td><td>50 credits, free plan does not expire</td><td>Finder + verifier</td><td>Campaign features are separate.</td></tr>
+<tr><td><a href="https://skrapp.io/pricing">Skrapp.io</a></td><td>50 credits free</td><td>Verified business emails</td><td>Only deliverable emails count, per their site.</td></tr>
+<tr><td><a href="https://zerobounce.net/pricing">ZeroBounce</a></td><td>100 free monthly verifications</td><td>Mailbox-level verification</td><td>Free tier requires signup with a business domain, not Gmail.</td></tr>
+<tr><td><a href="https://apollo.io/pricing">Apollo.io</a></td><td>Free plan exists (light usage)</td><td>Large B2B contact database</td><td>Export and credit limits change often; verify before relying.</td></tr></table>
+
+<div class="note"><b>Honest limits:</b> raw SMTP mailbox probing cannot run on Cloudflare Workers or Vercel (outbound port 25 is blocked), so true mailbox verification comes from the keyed APIs above; the Verified label is reserved for that. MX records cannot detect catch-all domains. Pattern-generated addresses are labeled Unverified guess, and no candidate is presented as the best email without address-specific evidence. Gravatar/PGP hits are labeled Seen publicly (past public use, not current deliverability). The app stores nothing, but checks do query outside services: domain to a public DNS resolver, company name to Clearbit, hashed candidates to Gravatar, candidates to the PGP keyserver, the name to GitHub search, and scanned page URLs to a reader relay; private/internal or credentialed URLs are refused. LinkedIn itself stays off-limits: they block scraping hard and it gets tools banned.</div>
+</body></html>

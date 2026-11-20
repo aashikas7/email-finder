@@ -1,0 +1,6 @@
+name = "email-finder"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# Secrets (never commit values):
+#   wrangler secret put HUNTER_API_KEY

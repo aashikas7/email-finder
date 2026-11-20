@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Email Finder - work email from a LinkedIn profile, a page, or a name</title>
+<meta name="description" content="Paste a LinkedIn profile URL, a job page, or a name and company; get work emails with honest provenance: published, verified, likely or guess. No LinkedIn scraping. Works worldwide."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--ink:#16181d;--panel:#1e2128;--line:#2c313b;--tx:#e8e6e1;--mute:#8d939e;--acc:#6ab7ff;--hr:#f2b84b;--ok:#7bd0a4;--bad:#e07a7a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--tx);line-height:1.5;font-family:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+a{color:var(--acc)}
+button,input{font:inherit;color:inherit}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px 80px}
+.top{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--line);padding-bottom:16px}
+.top h1{margin:0;font-size:28px}
+.sub{color:var(--mute);margin:2px 0 0;font-size:14px}
+.sub2{color:var(--mute);font-size:13px}
+.stats{display:flex;gap:20px;font-size:13px}
+.stats b{display:block;font-size:15px}
+.stats span{color:var(--mute)}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+h2{font-size:24px;margin:28px 0 4px}
+.lede{color:var(--mute);max-width:72ch;margin:0 0 20px;font-size:14px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.box h3{margin:0 0 10px;font-size:15px}
+.box h3 .n{color:var(--acc);margin-right:6px}
+.lbl{font-size:13px;color:var(--mute);margin:10px 0 6px}
+input[type=text],input[type=url]{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+input:focus{outline:none;border-color:var(--acc)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1 1 160px}
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px;text-align:center}
+.btn.p{background:var(--acc);color:#0b1620;border-color:var(--acc);font-weight:600}
+.btn:disabled{opacity:.5;cursor:default}
+.acwrap{position:relative}
+.ac{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--ink);border:1px solid var(--line);border-radius:8px;overflow:hidden;z-index:10;display:none}
+.ac div{padding:8px 12px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.ac div:hover{background:var(--panel)}
+.ac small{color:var(--mute)}
+.badge{display:inline-block;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.badge.verified{background:rgba(123,208,164,.15);color:var(--ok);border:1px solid var(--ok)}
+.badge.published{background:rgba(123,208,164,.15);color:var(--ok);border:1px solid var(--ok)}
+.badge.likely{background:rgba(106,183,255,.12);color:var(--acc);border:1px solid var(--acc)}
+.badge.seen-publicly{background:rgba(106,183,255,.12);color:var(--acc);border:1px solid var(--acc)}
+.badge.guess{background:rgba(242,184,75,.12);color:var(--hr);border:1px solid var(--hr)}
+.badge.inconclusive{background:rgba(242,184,75,.12);color:var(--hr);border:1px solid var(--hr)}
+.badge.unlikely{background:rgba(224,122,122,.12);color:var(--bad);border:1px solid var(--bad)}
+.best{background:var(--panel);border:1px solid var(--acc);border-radius:10px;padding:18px;margin:16px 0 10px}
+.best .em{font-size:22px;font-weight:700;word-break:break-all;margin-top:8px}
+.best .why,.why{color:var(--mute);font-size:13px;margin-top:8px}
+table.alt{width:100%;border-collapse:collapse;font-size:14px}
+table.alt td,table.alt th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:middle}
+table.alt th{color:var(--mute);font-weight:400;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.mono{font-variant-numeric:tabular-nums}
+.copy{border:1px solid var(--line);background:transparent;border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer;color:var(--mute)}
+.copy:hover{color:var(--tx);border-color:var(--mute)}
+.status{color:var(--mute);font-size:13px;margin:8px 0}
+.status b{color:var(--tx);font-weight:600}
+.err{border:1px solid var(--bad);border-radius:8px;padding:10px 12px;color:var(--bad);font-size:14px;margin:10px 0;display:none}
+.footnote{color:var(--mute);font-size:13px;margin-top:8px}
+.footnote b{color:var(--tx)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div>
+      <h1>Email Finder</h1>
+      <p class="sub">Work emails with honest provenance</p>
+    </div>
+    <div class="stats">
+      <div><span><i class="live"></i>Mode</span><b id="stMode">In-browser</b></div>
+      <div><span>Sources</span><b id="stSources">DNS · Clearbit · Gravatar · GitHub · PGP</b></div>
+      <div><span>LinkedIn scraping</span><b>None</b></div>
+    </div>
+  </header>
+
+  <h2>Find a work email</h2>
+  <p class="lede">Three ways in: a LinkedIn profile, a job or careers page, or an email you already have. Every result says where it came from: published on a page, seen in the wild, or a generated guess. No invented confidence scores. Works for companies worldwide.</p>
+
+  <section class="box">
+    <h3><span class="n">1</span>Find someone's email</h3>
+    <input type="url" id="li" placeholder="LinkedIn profile URL (optional), e.g. https://www.linkedin.com/in/firstname-lastname/" aria-label="LinkedIn profile URL"/>
+    <p class="sub" id="parseNote">The name comes from the public URL slug only; LinkedIn is never fetched. Or skip the URL and type a name below.</p>
+    <div class="row">
+      <div><div class="lbl">First name</div><input type="text" id="first" aria-label="First name"/></div>
+      <div><div class="lbl">Last name</div><input type="text" id="last" aria-label="Last name"/></div>
+    </div>
+    <div class="row">
+      <div class="acwrap">
+        <div class="lbl">Company</div>
+        <input type="text" id="company" placeholder="Company name, e.g. FloBiz" autocomplete="off" aria-label="Company name"/>
+        <div class="ac" id="ac"></div>
+      </div>
+      <div><div class="lbl">Domain (auto-filled, or type it)</div><input type="text" id="domain" placeholder="company.com" aria-label="Company domain"/></div>
+    </div>
+    <div style="margin-top:12px"><button class="btn p" id="go">Find email</button></div>
+    <div class="err" id="err"></div>
+    <div class="status" id="status"></div>
+    <div id="results" class="hidden">
+      <div class="best" id="best"></div>
+      <table class="alt">
+        <thead><tr><th>Candidate</th><th>Pattern</th><th>Confidence</th><th></th></tr></thead>
+        <tbody id="altBody"></tbody>
+      </table>
+      <p class="status" id="srcLine"></p>
+    </div>
+  </section>
+
+  <section class="box">
+    <h3><span class="n">2</span>Find published emails on a page</h3>
+    <p class="sub">Paste a job posting, careers page or contact page. Addresses found verbatim are labeled <span class="badge published">Published</span> with a link to the source page. Private or internal URLs and URLs containing credentials are refused before any fetch.</p>
+    <div class="row">
+      <input type="url" id="pageUrl" placeholder="https://company.com/careers or a job posting link" aria-label="Page URL"/>
+      <button class="btn p" id="scanGo" style="flex:0 0 auto">Scan page</button>
+    </div>
+    <div class="err" id="scanErr"></div>
+    <div class="status" id="scanStatus"></div>
+    <div id="scanResults" class="hidden">
+      <table class="alt">
+        <thead><tr><th>Email</th><th>Source</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="scanBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="box">
+    <h3><span class="n">3</span>Check an email you already have</h3>
+    <div class="row">
+      <input type="text" id="checkEmail" placeholder="someone@company.com" aria-label="Email to check"/>
+      <button class="btn p" id="checkGo" style="flex:0 0 auto">Check</button>
+    </div>
+    <div class="err" id="checkErr"></div>
+    <div class="status" id="checkStatus"></div>
+    <div id="checkResult" class="hidden"><div class="best" id="checkVerdict" style="border-color:var(--line)"></div></div>
+  </section>
+
+  <section class="box footnote">
+    <b>How to read the labels.</b>
+    <span class="badge published">Published</span> the address appears verbatim on a page you pointed at, or on the person's public GitHub. A company's own site or the person's own profile is a stronger source than an aggregator repeating an address.
+    <span class="badge verified">Verified</span> a connected verification API confirmed the mailbox. Only possible once the optional backend and an API key are set up.
+    <span class="badge seen-publicly">Seen publicly</span> the exact address appears publicly (Gravatar profile or PGP key). Proof of past public use, not of current deliverability or employer.
+    <span class="badge guess">Unverified guess</span> generated from common corporate patterns; the domain accepts mail, nothing more. No candidate is presented as the best email without address-specific evidence.
+    <span class="badge inconclusive">Inconclusive</span> the checks could not say either way.
+    <span class="badge unlikely">Unlikely</span> the domain has no mail records.
+    <br/><br/>
+    <b>Honest limits.</b> MX records show a domain accepts mail; they cannot detect catch-all domains, and this tool does not claim to. Mailbox-level confirmation needs a verification API (Hunter and others), which plugs into the backend worker in this repo when you add a key. A name read from a LinkedIn URL slug is a guess you can edit, never a verified identity.
+    <br/><br/>
+    <b>Privacy: what leaves your browser.</b> The app stores nothing and uses no account, but checks do talk to outside services: the domain goes to a public DNS resolver (Cloudflare), the company name to Clearbit, a hash of each top candidate to Gravatar, top candidates to the PGP keyserver, the name to GitHub search, and a scanned page's URL to a public reader relay (r.jina.ai, fallback allorigins). Private or internal URLs and URLs containing credentials are refused before any relay is used. LinkedIn is never fetched or scraped.
+  </section>
+</main>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
